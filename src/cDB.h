@@ -42,7 +42,7 @@ public:
     void addPatient(
         const std::string &name);
 
-    vperson_t nurse();
+    vperson_t nursebyDate( int att);
     person_t nurse(int pid);
     vperson_t patient();
     person_t patient(int pid);
@@ -52,4 +52,11 @@ private:
     std::vector<sValue> myValue; /// the database
     vperson_t myNurseList;       /// the displayed nurses
     vperson_t myPatientList;     /// the displayed patients
+
+    /// @brief sort person list into attribute date order
+    /// @param[in/out] list 
+    /// @param att attribute index in person_t
+    void sort(
+        vperson_t& list,
+        int att    );
 };

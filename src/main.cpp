@@ -75,25 +75,28 @@ void cDB::updateNurse(
     const std::string &name,
     const std::string &licence,
     const std::string &service)
+{
+    for (auto &v : myValue)
     {
-        for( auto& v : myValue ) {
-            if( v.pid == pid ) {
-                switch( v.aid ) {
-                    case eAttribute::name:
-                    v.value = name;
-                    break;
-                    case eAttribute::nurselicence:
-                    v.value = licence;
-                    break;
-                    case eAttribute::inService:
-                    v.value = service;
-                    break;
-                    default:
-                    break;
-                }
+        if (v.pid == pid)
+        {
+            switch (v.aid)
+            {
+            case eAttribute::name:
+                v.value = name;
+                break;
+            case eAttribute::nurselicence:
+                v.value = licence;
+                break;
+            case eAttribute::inService:
+                v.value = service;
+                break;
+            default:
+                break;
             }
         }
     }
+}
 void cDB::addNurse(
     const std::string &name,
     const std::string &licence,
@@ -126,19 +129,6 @@ void cDB::addPatient(
     v.value = "patient";
 }
 
-cDB::vperson_t cDB::nurse()
-{
-    myNurseList.clear();
-    for (auto &v : myValue)
-    {
-        if (v.aid == eAttribute::role && v.value == "nurse")
-        {
-            myNurseList.push_back(
-                nurse(v.pid));
-        }
-    }
-    return myNurseList;
-}
 cDB::vperson_t cDB::patient()
 {
     myPatientList.clear();
@@ -156,7 +146,7 @@ cDB::person_t cDB::nurse(int pid)
 {
     person_t ret;
     ret.first = pid;
-    ret.second.resize(3);
+    ret.second.resize(4);
     for (auto &v : myValue)
     {
         if (v.aid == eAttribute::name && v.pid == pid)
@@ -280,13 +270,30 @@ void cGUI::addPatient()
 }
 void cGUI::listNurse()
 {
+    // clear the old list
     lsNurse.clear();
-    for (auto &n : theDB.nurse())
+
+    // calculate date attribute index
+    int dateIndex;
+    switch (chNurseOrder.selectedIndex())
+    {
+    case 0:
+        dateIndex = 1;
+        break;
+    case 1:
+        dateIndex = 2;
+        break;
+    default:
+        return;
+    }
+    
+    // populate list
+    for (auto &n : theDB.nursebyDate(dateIndex))
     {
         std::stringstream ss;
         for (auto &s : n.second)
         {
-            ss << std::setw(12) << s;
+            ss << std::setw(16) << s;
         }
         lsNurse.add(ss.str());
     }
