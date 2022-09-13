@@ -173,8 +173,6 @@ cDB::person_t cDB::patient(int pid)
 
 void cGUI::ConstructNursesPanel()
 {
-    plNurse.move(10, 10, 900, 400);
-
     lbNursePanel.move(20, 40, 100, 30);
     lbNursePanel.text("Nurses");
 
@@ -192,6 +190,7 @@ void cGUI::ConstructNursesPanel()
     chNurseOrder.move(80, 70, 100, 100);
     chNurseOrder.add("Licence");
     chNurseOrder.add("InService");
+    chNurseOrder.select(0);
     chNurseOrder.events().select(
         chNurseOrder.id(),
         [&]
@@ -211,8 +210,6 @@ void cGUI::ConstructNursesPanel()
 
 void cGUI::ConstructPatientsPanel()
 {
-    plPatient.move(10, 10, 900, 400);
-
     bnPatientAdd.move(200, 40, 100, 30);
     bnPatientAdd.text("ADD");
     bnPatientAdd.events().click(
