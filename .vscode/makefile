@@ -30,9 +30,11 @@ OBJ_starter = \
 
 ### COMPILE
 
-$(ODIR)/%.o: %.cpp  
+$(ODIR)/%.o: %.cpp cDB.h
 	g++  $(CCflags) \
 	-c -o $@ $< $(INCS)
+
+### LINK
 
 starter: $(OBJ_starter)
 	g++ $(OPT) \

@@ -8,52 +8,7 @@
 #include <inputbox.h>
 #include "cStarterGUI.h"
 
-class cDB
-{
-    enum class eAttribute
-    {
-        none,
-        role,
-        name,
-        nurselicence,
-        inService,
-    };
-    struct sValue
-    {
-        eAttribute aid;
-        int pid;
-        std::string value;
-    };
-
-    /// @brief A pair describing a person
-    /// first is the person's id
-    /// second is a vector of strings containing the person's attributes
-    typedef std::pair<
-        int, std::vector<std::string>>
-        person_t;
-
-    /// @brief A vector describing a subset of persons
-    typedef std::vector<person_t> vperson_t;
-
-public:
-    void addNurse(
-        const std::string &name,
-        const std::string &licence,
-        const std::string &service);
-    void addPatient(
-        const std::string &name);
-
-    vperson_t nurse();
-    person_t nurse(int pid);
-    vperson_t patient();
-    person_t patient(int pid);
-
-private:
-    static int lastPID;
-    std::vector<sValue> myValue; /// the database
-    vperson_t myNurseList;       /// the displayed nurses
-    vperson_t myPatientList;     /// the displayed patients
-};
+#include "cDB.h"
 
 int cDB::lastPID = -1;
 
@@ -115,6 +70,30 @@ private:
     void listPatient();
 };
 
+void cDB::updateNurse(
+    int pid,
+    const std::string &name,
+    const std::string &licence,
+    const std::string &service)
+    {
+        for( auto& v : myValue ) {
+            if( v.pid == pid ) {
+                switch( v.aid ) {
+                    case eAttribute::name:
+                    v.value = name;
+                    break;
+                    case eAttribute::nurselicence:
+                    v.value = licence;
+                    break;
+                    case eAttribute::inService:
+                    v.value = service;
+                    break;
+                    default:
+                    break;
+                }
+            }
+        }
+    }
 void cDB::addNurse(
     const std::string &name,
     const std::string &licence,
@@ -197,9 +176,9 @@ cDB::person_t cDB::patient(int pid)
     for (auto &v : myValue)
     {
         if (v.aid == eAttribute::name && v.pid == pid)
-            ret.second[0] = v.value;  
+            ret.second[0] = v.value;
     }
-    return ret;  
+    return ret;
 }
 
 void cGUI::ConstructNursesPanel()
@@ -236,6 +215,7 @@ void cGUI::ConstructNursesPanel()
         [&]
         {
             editNurse();
+            listNurse();
         });
 }
 
@@ -264,6 +244,25 @@ void cGUI::addNurse()
     ib.showModal();
 
     theDB.addNurse(
+        ib.value("Name"),
+        ib.value("Licence"),
+        ib.value("Service"));
+}
+void cGUI::editNurse()
+{
+    auto nurse = theDB.nurse(
+        lsNurse.selectedIndex());
+
+    wex::inputbox ib;
+    ib.text("Nurse");
+    ib.add("Name", nurse.second[0]);
+    ib.add("Licence", nurse.second[1]);
+    ib.add("Service", nurse.second[2]);
+
+    ib.showModal();
+
+    theDB.updateNurse(
+        nurse.first,
         ib.value("Name"),
         ib.value("Licence"),
         ib.value("Service"));
@@ -304,11 +303,6 @@ void cGUI::listPatient()
         }
         lsPatient.add(ss.str());
     }
-}
-
-void cGUI::editNurse()
-{
-    theDB.nurse(lsNurse.selectedIndex());
 }
 
 main()
