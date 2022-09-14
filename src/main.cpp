@@ -69,49 +69,11 @@ private:
 
     void addPatient();
     void listPatient();
+    void editPatient();
 };
 
-cDB::vperson_t cDB::patient()
-{
-    myPatientList.clear();
-    for (auto &v : myValue)
-    {
-        if (v.aid == eAttribute::role && v.value == "patient")
-        {
-            myPatientList.push_back(
-                patient(v.pid));
-        }
-    }
-    return myPatientList;
-}
-cDB::person_t cDB::nurse(int pid)
-{
-    person_t ret;
-    ret.first = pid;
-    ret.second.resize(4);
-    for (auto &v : myValue)
-    {
-        if (v.aid == eAttribute::name && v.pid == pid)
-            ret.second[0] = v.value;
-        if (v.aid == eAttribute::nurselicence && v.pid == pid)
-            ret.second[1] = v.value;
-        if (v.aid == eAttribute::inService && v.pid == pid)
-            ret.second[2] = v.value;
-    }
-    return ret;
-}
-cDB::person_t cDB::patient(int pid)
-{
-    person_t ret;
-    ret.first = pid;
-    ret.second.resize(1);
-    for (auto &v : myValue)
-    {
-        if (v.aid == eAttribute::name && v.pid == pid)
-            ret.second[0] = v.value;
-    }
-    return ret;
-}
+
+
 
 void cGUI::ConstructNursesPanel()
 {
@@ -162,6 +124,17 @@ void cGUI::ConstructPatientsPanel()
             addPatient();
             listPatient();
         });
+
+    lsPatient.move(10, 120, 900, 400);
+        lsPatient.events().select(
+        lsPatient.id(),
+        [&]
+        {
+            editPatient();
+            listPatient();
+        });
+
+    listPatient();
 }
 
 void cGUI::addNurse()
@@ -181,7 +154,7 @@ void cGUI::addNurse()
 }
 void cGUI::editNurse()
 {
-    auto nurse = theDB.nurse(
+    auto nurse = theDB.nurselist(
         lsNurse.selectedIndex());
 
     wex::inputbox ib;
@@ -201,13 +174,49 @@ void cGUI::editNurse()
 void cGUI::addPatient()
 {
     wex::inputbox ib;
+    ib.labelWidth(100);
     ib.text("Patient");
     ib.add("Name", "");
+    ib.add("Expire", "");
+    ib.add("Certification", "");
+    ib.add("Authorization", "");
+    ib.add("Supplies", "");
 
     ib.showModal();
 
-    theDB.addPatient(
-        ib.value("Name"));
+    std::vector<std::string> vals;
+    vals.push_back(ib.value("Name"));
+    vals.push_back(ib.value("Expire"));
+    vals.push_back(ib.value("Certification"));
+    vals.push_back(ib.value("Authorization"));
+    vals.push_back(ib.value("Supplies"));
+    theDB.addPatient( vals );
+}
+void cGUI::editPatient()
+{
+     auto patient = theDB.patientlist(
+        lsPatient.selectedIndex());
+
+    wex::inputbox ib;
+    ib.text("Patient");
+    ib.labelWidth(100);
+    ib.add("Name", patient.second[0]);
+    ib.add("Expire", patient.second[1]);
+    ib.add("Certification", patient.second[2]);
+    ib.add("Authorization", patient.second[3]);
+    ib.add("Supplies", patient.second[4]);
+
+    ib.showModal(); 
+
+    std::vector<std::string> vals;
+    vals.push_back(ib.value("Name"));
+    vals.push_back(ib.value("Expire"));
+    vals.push_back(ib.value("Certification"));
+    vals.push_back(ib.value("Authorization"));
+    vals.push_back(ib.value("Supplies"));
+    theDB.updatePatient( 
+        patient.first,
+        vals ); 
 }
 void cGUI::listNurse()
 {
@@ -242,7 +251,7 @@ void cGUI::listNurse()
 void cGUI::listPatient()
 {
     lsPatient.clear();
-    for (auto &n : theDB.patient())
+    for (auto &n : theDB.patientbyDate(1))
     {
         std::stringstream ss;
         for (auto &s : n.second)

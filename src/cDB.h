@@ -8,7 +8,11 @@ class cDB
         role,
         name,
         nurselicence,
-        inService,
+        service,
+        expire,
+        certification,
+        authorization,
+        supplies,
     };
 
     /// @brief An attribute value for a person
@@ -44,12 +48,31 @@ public:
         const std::string &licence,
         const std::string &service);
     void addPatient(
-        const std::string &name);
+        const std::vector<std::string> &vals);
 
-    vperson_t nursebyDate( int att);
-    person_t nurse(int pid);
-    vperson_t patient();
-    person_t patient(int pid);
+    /// @brief list of nurses for display, sorted by date
+    /// @param[in] att index of attribute to sort by
+    /// @return list
+    vperson_t nursebyDate(int att);
+
+    /// @brief nurse from display list
+    /// @param[in] listIndex index
+    /// @return description
+    person_t nurselist(int listIndex);
+
+    /// @brief nurse with pid
+    /// @param[in] pid id
+    /// @return description
+    person_t nursePID(int pid);
+
+    vperson_t patientbyDate(int att);
+
+    person_t patientlist(int listIndex);
+    person_t patientPID(int pid);
+
+    void updatePatient(
+        int pid,
+        const std::vector<std::string>& vals     );
 
 private:
     std::string myfname;
@@ -59,11 +82,14 @@ private:
     vperson_t myPatientList;     /// the displayed patients
 
     /// @brief sort person list into attribute date order
-    /// @param[in/out] list 
+    /// @param[in/out] list
     /// @param att attribute index in person_t
     void sort(
-        vperson_t& list,
-        int att    );
+        vperson_t &list,
+        int att);
     void save();
     void load();
+    long long  secs(
+        const person_t& p,
+        int index);
 };
