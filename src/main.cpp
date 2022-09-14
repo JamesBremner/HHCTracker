@@ -10,7 +10,7 @@
 
 #include "cDB.h"
 
-int cDB::lastPID = -1;
+
 
 class cGUI : public cStarterGUI
 {
@@ -31,6 +31,7 @@ public:
           bnPatientAdd(wex::maker::make<wex::button>(plPatient)),
           lsPatient(wex::maker::make<wex::list>(plPatient))
     {
+
         tabs.move(0, 0, 1000, 500);
         tabs.tabWidth(200);
         tabs.add("Nurses", plNurse);
@@ -69,65 +70,6 @@ private:
     void addPatient();
     void listPatient();
 };
-
-void cDB::updateNurse(
-    int pid,
-    const std::string &name,
-    const std::string &licence,
-    const std::string &service)
-{
-    for (auto &v : myValue)
-    {
-        if (v.pid == pid)
-        {
-            switch (v.aid)
-            {
-            case eAttribute::name:
-                v.value = name;
-                break;
-            case eAttribute::nurselicence:
-                v.value = licence;
-                break;
-            case eAttribute::inService:
-                v.value = service;
-                break;
-            default:
-                break;
-            }
-        }
-    }
-}
-void cDB::addNurse(
-    const std::string &name,
-    const std::string &licence,
-    const std::string &service)
-{
-    sValue v;
-    v.aid = eAttribute::name;
-    v.pid = ++lastPID;
-    v.value = name;
-    myValue.push_back(v);
-    v.aid = eAttribute::role;
-    v.value = "nurse";
-    myValue.push_back(v);
-    v.aid = eAttribute::nurselicence;
-    v.value = licence;
-    myValue.push_back(v);
-    v.aid = eAttribute::inService;
-    v.value = service;
-    myValue.push_back(v);
-}
-void cDB::addPatient(
-    const std::string &name)
-{
-    sValue v;
-    v.aid = eAttribute::name;
-    v.pid = ++lastPID;
-    v.value = name;
-    myValue.push_back(v);
-    v.aid = eAttribute::role;
-    v.value = "patient";
-}
 
 cDB::vperson_t cDB::patient()
 {
@@ -206,6 +148,8 @@ void cGUI::ConstructNursesPanel()
             editNurse();
             listNurse();
         });
+    listNurse();
+
 }
 
 void cGUI::ConstructPatientsPanel()

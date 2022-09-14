@@ -17,6 +17,8 @@ class cDB
         eAttribute aid;    /// attribute
         int pid;           /// person ID
         std::string value; /// value of attribute
+        std::string text_for_file();
+        void text_from_file();
     };
 
     /// @brief A pair describing a person
@@ -30,6 +32,8 @@ class cDB
     typedef std::vector<person_t> vperson_t;
 
 public:
+    cDB();
+
     void addNurse(
         const std::string &name,
         const std::string &licence,
@@ -48,6 +52,7 @@ public:
     person_t patient(int pid);
 
 private:
+    std::string myfname;
     static int lastPID;
     std::vector<sValue> myValue; /// the database
     vperson_t myNurseList;       /// the displayed nurses
@@ -59,4 +64,6 @@ private:
     void sort(
         vperson_t& list,
         int att    );
+    void save();
+    void load();
 };
