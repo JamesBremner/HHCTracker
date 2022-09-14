@@ -29,7 +29,9 @@ public:
           bnNurseAdd(wex::maker::make<wex::button>(plNurse)),
 
           bnPatientAdd(wex::maker::make<wex::button>(plPatient)),
-          lsPatient(wex::maker::make<wex::list>(plPatient))
+          lsPatient(wex::maker::make<wex::list>(plPatient)),
+          lbPatientOrder(wex::maker::make<wex::label>(plPatient)),
+          chPatientOrder(wex::maker::make<wex::choice>(plPatient))
     {
 
         tabs.move(0, 0, 1000, 500);
@@ -57,6 +59,8 @@ private:
     wex::button &bnNurseAdd;
 
     wex::button &bnPatientAdd;
+    wex::label &lbPatientOrder;
+    wex::choice &chPatientOrder;
 
     cDB theDB;
 
@@ -122,6 +126,21 @@ void cGUI::ConstructPatientsPanel()
         [&]
         {
             addPatient();
+            listPatient();
+        });
+
+    lbPatientOrder.move(20, 70, 40, 30);
+    lbPatientOrder.text("Order");
+    chPatientOrder.move(80, 70, 100, 100);
+    chPatientOrder.add("Expire");
+    chPatientOrder.add("Certicication");
+    chPatientOrder.add("Authorization");
+    chPatientOrder.add("Supplies");
+    chPatientOrder.select(0);
+    chPatientOrder.events().select(
+        chPatientOrder.id(),
+        [&]
+        {
             listPatient();
         });
 
@@ -251,7 +270,9 @@ void cGUI::listNurse()
 void cGUI::listPatient()
 {
     lsPatient.clear();
-    for (auto &n : theDB.patientbyDate(1))
+    for (auto &n :
+         theDB.patientbyDate(
+            chPatientOrder.selectedIndex()))
     {
         std::stringstream ss;
         for (auto &s : n.second)
